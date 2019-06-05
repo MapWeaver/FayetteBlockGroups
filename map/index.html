@@ -158,9 +158,6 @@
 
 
 
-
-
-
     // function called when Promise above is complete
     function drawMap(data) {
 
@@ -219,13 +216,8 @@
 
 
       // define radius generator
-      // I didn't apply the proportional symbols as I didn't figure out how to replace the chained radius attribute. Kept getting errors. No luck. Not sure what the solution is.
       const radius = d3.scaleSqrt().domain([0, 1e6]).range([1, 9]);
-      //.attr('r', d => {
-      //console.log(d); // access to the data here!!!
-      //return radius(+d.Total);
-      //})
-      //console.log(radius(25)); // output is 1.04
+      console.log(radius(25)); // output is 1.04
 
 
       // TEST YOUR KNOWLEDGE: BECAUSE THE VARIABLES ARE DIFFERENT, THE COLORS SHOULD BE DIFFERENT AS WELL RATHER THAN INFERING INFORMATION FROM A GRADIENT.
