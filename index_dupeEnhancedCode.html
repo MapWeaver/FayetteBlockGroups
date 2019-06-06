@@ -147,9 +147,6 @@
     // asynchronous calls to data files
     const statesJson = d3.json('data/us-states.json');
     const facilityCSV = d3.csv('data/facility-emissions-2016.csv');
-    //const bgTopojson = d3.json('data/FayetteBG_WGS84_esri_topo.json');
-
-    // console.log("BgJson: ", bgJson)
 
     // use promise to call all data files, then send data to callback
     Promise.all([statesJson, facilityCSV])
@@ -167,7 +164,6 @@
       // from the promised array, define the data pieces with which we will now work. data is array of our two datasets.
       const statesData = data[0];
       const facilityData = data[1];
-      // const fayetteData = data[2];
 
       // select the HTML element that will hold our map
       const mapContainer = d3.select('#map')
@@ -188,7 +184,7 @@
         .style('left', 30);
 
 
-// STOPPING POINT
+
       // convert the states data topojson to a geojson. this is so we can work with it... in projecting?
       const geojson = topojson.feature(statesData, {
         type: 'GeometryCollection',
@@ -214,7 +210,7 @@
 
       // define radius generator
       const radius = d3.scaleSqrt().domain([0, 1e6]).range([1, 9]);
-      // console.log(radius(25)); // output is 1.04
+      console.log(radius(25)); // output is 1.04
 
       // define color generator.
       const color = d3.scaleOrdinal(d3.schemeSet1);
