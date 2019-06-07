@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Fayette Stats</title>
+
+  <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/cerulean/bootstrap.min.css" rel="stylesheet" integrity="sha384-C++cugH8+Uf86JbNOnQoBweHHAe/wVKN/mb0lTybu/NZ9sEYbd+BbbYtNpWYAsNP" crossorigin="anonymous">
+  <style>
+    #map {
+      width: 100%;
+      height: calc(40vh);
+    }
+
+    .state {
+      fill: #61aab6;
+      stroke: whitesmoke;
+      stroke-width: .7;
+    }
+
+    #about {
+      max-height: calc(80vh);
+      overflow-y: scroll;
+    }
+
+    .legend circle {
+      fill: none;
+      stroke: #ccc;
+    }
+
+    .legend text {
+      fill: #777;
+      font: 10px sans-serif;
+      text-anchor: middle;
+    }
+
+    .facility {
+      fill: #cf5635;
+      stroke: white;
+      stroke-width: .3;
+      opacity: 1;
+    }
+
+    .facility:hover {
+      stroke-width: 2;
+    }
+
+    #ui {
+      position: absolute;
+      right: 1em;
+      top: 1em;
+    }
+
+    /* Small devices (landscape phones, 576px and up) */
+
+    @media (min-width: 576px) {}
+
+    /* Medium devices (tablets, 768px and up) */
+
+    @media (min-width: 768px) {
+      #map {
+        height: calc(60vh);
+      }
+    }
+
+    /* Large devices (desktops, 992px and up) */
+
+    @media (min-width: 992px) {
+
+      #map {
+        height: calc(80vh);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container-fluid">
+
+    <header class="row py-3 bg-dark text-white">
+      <div class="col mx-2">
+        <h1 class="h1">Deep Data Dive: Fayette County Block Groups</h1>
+      </div>
+    </header>
+
+
+
+    <section class="row bg-secondary ">
+
+      <div class="col-12 col-md-7 col-lg-8 px-0">
+        <div id="map" class="bg-light position-relative">
+          <div id="ui" class="dropdown">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Select Statistic
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside id="about" class="col-12 col-md-5 col-lg-4 text-dark py-2">
+        <section>
+          <h2 class="h3 text-dark">Map Interpretation:</h2>
+          <p>By better understanding the composition of a place, we are more empowered to navigate and shape it's reality. This map provides detailed block group level statistical information from 2016 5-year American Community Survey in the categories of
+            Population, Housing, Education, Marriage, and Family.</p>
+          <p><b>Population</b><br>Total Population(B02001e1)/Area(ALAND)<br>? INCLUDE LEGEND BENEATH EACH ITEM LISTED IN PANE AS A MEANS OF SHOWING THE RANGE OF VALUES ACROSS CATEGORIES USING THE SAME CLASSIFICATION METHOD (PROBABLY QUANTILES)?</p>
+          <p><b>Housing</b><br>Vacant Housing(B25002e3)/Total Housing Units(B25002e1)</p>
+          <p><b>Education</b><br>Bachelor's Degree(B15003e22)/25+ Population(B15003e1)</p>
+          <p><b>Marriage</b><br>Females Currently Married(B12001e13)/Total Females(B12001e11)</p>
+          <p><b>Family</b><br>Families Below Poverty Level(B17010e2)/Total Families(B17010e1)</p>
+        </section>
+      </aside>
+
+    </section>
+
+
+    <footer class="row bg-dark text-white py-3">
+      <div class="col mx-2">
+        <ul class="list-unstyled">
+          <li>Map Developer: <a href="https://github.com/MapWeaver"> L Weaver</a></li>
+          <li>Data Source:<a href="https://www.census.gov/programs-surveys/geography.html"> U.S. Census Bureau American Community Survey</a>
+        </ul>
+      </div>
+    </footer>
+
+
+  </div>
+  <!-- end .container-fluid -->
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+  <script src="https://d3js.org/d3.v5.js"></script>
+  <script src="https://unpkg.com/topojson@3"></script>
+
+
+
+  <script>
+    // JavaScript
+
+    // asynchronous calls to data files
+    const statesJson = d3.json('data/us-states.json');
+    const facilityCSV = d3.csv('data/facility-emissions-2016.csv');
+
+    // use promise to call all data files, then send data to callback
+    Promise.all([statesJson, facilityCSV])
+      .then(drawMap)
+      .catch(error => {
+        console.log(error)
+      });
+
+    // FUNCTION
+    // function called when Promise above is complete. Draw the map.
+    function drawMap(data) {
+
+      // console.log(data); // our two datasets within an array
+
+      // from the promised array, define the data pieces with which we will now work. data is array of our two datasets.
+      const statesData = data[0];
+      const facilityData = data[1];
+
+      // select the HTML element that will hold our map
+      const mapContainer = d3.select('#map')
+
+      // determine width and height of map from container
+      const width = mapContainer.node().offsetWidth - 60;
+      const height = mapContainer.node().offsetHeight - 60;
+
+
+
+      // the www on svg: svg element is a container that defines a new coordinate system and viewport. It is used as the outermost element of SVG documents, but it can also be used to embed a SVG fragment inside an SVG or HTML document.
+      const svg = mapContainer
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .classed('position-absolute', true) // add bootstrap class
+        .style('top', 40)
+        .style('left', 30);
+
+
+
+      // convert the states data topojson to a geojson. this is so we can work with it... in projecting?
+      const geojson = topojson.feature(statesData, {
+        type: 'GeometryCollection',
+        geometries: statesData.objects.cb_2016_us_state_20m.geometries
+      });
+
+      // fit the contents to the extent using the geoAlbersUsa projection
+      const projection = d3.geoAlbersUsa()
+        .fitSize([width, height], geojson);
+      const path = d3.geoPath()
+        .projection(projection);
+
+
+
+
+      // draw certain data to the map namely the state data converted to geojson above
+      const states = svg.append('g')
+        .selectAll('path')
+        .data(geojson.features)
+        .join('path')
+        .attr('d', path)
+        .attr('class', 'state');
+
+      // define radius generator
+      const radius = d3.scaleSqrt().domain([0, 1e6]).range([1, 9]);
+      console.log(radius(25)); // output is 1.04
+
+      // define color generator.
+      const color = d3.scaleOrdinal(d3.schemeSet1);
+      // console.log(color('Power Plants')); // output is #e41a1c
+
+
+
+      const facilities = svg.append('g') // append new g element
+        .selectAll('circle') // select all the circles
+        .data(facilityData) // use the facility CSV data
+        .join('circle') // join that data to circle elements
+        .attr('cx', d => { // feed the long/lat to the projection generator. cx = horizontal pixel distance from the top left corder of the parent SVG element to the center of the circle
+          d.position = projection([d.Longitude, d.Latitude]); // create a new data attribute
+          return d.position[0]; // position the x
+        })
+        .attr('cy', d => { // cy = vertical pixel distance from the top left corder of the parent SVG element to the center of the circle
+          return d.position[1]; // position the y
+        })
+        .style('fill', d => {
+          return color(d.Industry_Type);
+        })
+        // .attr('r', 2) // define the radius. r = the radius in pixels
+        .data(facilityData.sort(function(a, b) {
+          return b.Total - a.Total; // place the large ones on the bottom
+        }))
+        .attr('r', d => {
+          // console.log('data', d)
+          return radius(+d.Total);
+        })
+        .attr('class', 'facility'); // give each circle a class name
+
+
+
+      filterByAttribute(facilityData, facilities);
+
+      drawLegend(svg, width, height, radius);
+    }
+
+    // FUNCTION
+    // Filter by attribute.
+    function filterByAttribute(facilityData, facilities) {
+      // code
+
+      // CREATE ARRAY OF INIQUE INDUSTRY TYPES
+      // array to hold select options
+      var uniqueTypes = [];
+
+      // loop through all features and push unique types to array
+      facilityData.forEach(function(facility) {
+        if (!uniqueTypes.includes(facility.Industry_Type)) {
+          uniqueTypes.push(facility.Industry_Type);
+        }
+      });
+
+      // sort strings alphabetically
+      uniqueTypes.sort();
+
+      // add an all facilities to the beginning
+      uniqueTypes.unshift('All facilities');
+
+
+      // DYNAMICALLY CREATE HTML ELEMENTS OF THE DROPDOWN OPTIONS
+      // select all the options (that don't exist yet)
+      d3.select('#ui .dropdown-menu').selectAll('a')
+        .data(uniqueTypes) // use array as data
+        .join('a') // append a new option element for each data item
+        .text(d => {
+          return d // use the item as text
+        })
+        .attr('value', d => {
+          return d // use the time as value attribute
+        })
+        .attr('href', '#')
+        .classed('dropdown-item', true)
+        .on('click', onchange(facilities)); // when the user clicks call onchange function
+    }
+
+    // FUNCTION
+    // DETERMINE WHICH DROPDOWN WAS SELECTED, DISPLAY SELECTED CIRCLE(S), UPDATE THE UI WITH THE CURRENT SELECTION
+    function onchange(facilities) {
+      // get the currently selected value
+      let val = d3.select(this).attr('value');
+
+      // change the display property for each circle
+      facilities.style('display', d => {
+        if (val === 'All facilities') return 'inline';
+        if (d.Industry_Type != val) return 'none';
+      });
+
+      d3.select('#ui > a').html(val); // update the UI with current val
+    }
+
+    // FUNCTION
+    // DRAW LEGEND
+    function drawLegend(svg, width, height, radius) {
+
+      const legend = svg.append('g')
+        .attr('dy', '1.3em')
+        .attr('class', 'legend')
+        .attr('transform', 'translate(' + (width - 40) + ',' + (height - 20) + ')')
+        .selectAll('g')
+        .data([5e6, 2e7])
+        .join('g');
+
+      legend.append('circle')
+        .attr('cy', d => {
+          return -radius(d);
+        })
+        .attr('r', radius);
+
+      legend.append('text')
+        .attr('y', d => {
+          return -2 * radius(d);
+        })
+        .attr('dy', '1.3em')
+        .text(d3.format('.1s'));
+
+      legend.append('text')
+        .attr('y', 16)
+        .text('metric tons');
+      //}
+    }
+
+
+  </script>
+</body>
+
+</html>
