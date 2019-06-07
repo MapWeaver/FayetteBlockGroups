@@ -108,7 +108,7 @@
 
           <!-- ui-controls div is selected by the JS and dynamically added to the map -->
           <div id='ui-controls'>
-            <label>What would you like to explore? </label>
+            <!-- <label>What would you like to explore? </label> -->
             <!-- instructions for the user as label -->
             <select id="Housing">
               <option value="B25002e3" selected>Housing</option>
@@ -224,12 +224,18 @@
     // console.log("test")
 
     // CALL DATA, DRAW MAP. AJAX call to load BG-level data
-    $.getJSON("data/FayetteBG_WGS84_esri_geo.json", function (data) {
+    $.getJSON("data/FayetteBG_WGS84_esri_topo.json", function (data) {
 
-      drawMap(data); // draw the map using GeoJSON data
+      // data is topojson here
+      console.log(data)
 
-      // This is where the code stops working. But why???
-      console.log("test")
+      //convert to GeoJSON
+      var dataGeoJson = topojson.feature(data, {
+        type: 'GeometryCollection',
+        geometries: data.objects.FayetteBG_WGS84_esri.geometries
+      });
+
+      drawMap(dataGeoJson); // draw the map using GeoJSON data
 
       // console.log("data")
     }).fail(function (err) {
@@ -412,7 +418,7 @@
 
       // create the dropdown control
       var selectControl = L.control({
-        position: 'bottomright'
+        position: 'topright'
       });
 
       // when control is added
