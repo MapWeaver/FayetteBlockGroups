@@ -225,12 +225,15 @@
 
     // CALL DATA, DRAW MAP. AJAX call to load BG-level data
     $.getJSON("data/FayetteBG_WGS84_esri_geo.json", function (data) {
+
       drawMap(data); // draw the map using GeoJSON data
 
       // This is where the code stops working. But why???
       console.log("test")
 
       // console.log("data")
+    }).fail(function (err) {
+      console.log(err)
     });
 
     // function called when Promise above is complete
@@ -272,7 +275,6 @@
       });
 
       // code moved to updateMap function
-
       addUi(dataLayer); // add the UI controls
 
       updateMap(dataLayer); // update the map with the current data attribute
