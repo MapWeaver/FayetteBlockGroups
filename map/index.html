@@ -3,21 +3,31 @@
 
 <head>
   <meta charset="utf-8">
+  <title>Fayette Stats</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>Fayette Stats</title>
 
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+  <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
   <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/cerulean/bootstrap.min.css" rel="stylesheet" integrity="sha384-C++cugH8+Uf86JbNOnQoBweHHAe/wVKN/mb0lTybu/NZ9sEYbd+BbbYtNpWYAsNP" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+
+
   <style>
     #map {
       width: 100%;
       height: calc(40vh);
     }
 
-    .state {
-      fill: #61aab6;
-      stroke: whitesmoke;
-      stroke-width: .7;
+
+    .leaflet-tooltip {
+      min-width: 200px;
+      font-size: 140%;
+      white-space: normal;
     }
 
     #about {
@@ -25,26 +35,34 @@
       overflow-y: scroll;
     }
 
-    .legend circle {
-      fill: none;
-      stroke: #ccc;
+    #legend {
+      padding: 6px 8px;
+      font-size: 1em;
+      background: rgba(247, 247, 247, 0.8);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      max-width: 165px;
     }
 
-    .legend text {
-      fill: #777;
-      font: 10px sans-serif;
-      text-anchor: middle;
+    #legend h5 {
+      font-size: 2.1rem;
     }
 
-    .facility {
-      fill: #cf5635;
-      stroke: white;
-      stroke-width: .3;
-      opacity: 1;
+    #legend span {
+      width: 150px;
+      height: 20px;
+      float: left;
+      margin: 0 10px 4px 0;
     }
 
-    .facility:hover {
-      stroke-width: 2;
+    #legend label {
+      font-size: 1em;
+    }
+
+    #legend label:after {
+      content: '';
+      display: block;
+      clear: both;
     }
 
     #ui {
@@ -52,6 +70,12 @@
       right: 1em;
       top: 1em;
     }
+
+
+
+
+
+
 
     /* Small devices (landscape phones, 576px and up) */
     @media (min-width: 576px) {}
@@ -75,6 +99,7 @@
 
 <body>
   <div class="container-fluid">
+
     <header class="row py-3 bg-dark text-white">
       <div class="col mx-2">
         <h1 class="h1">Deep Data Dive: Fayette County Block Groups</h1>
@@ -85,14 +110,18 @@
       <div class="col-12 col-md-7 col-lg-8 px-0">
         <div id="map" class="bg-light position-relative">
 
-
-          <div id="ui" class="dropdown">
-            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              All facilities
-            </a>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink"></div>
+          <!-- ui-controls div is selected by the JS and dynamically added to the map -->
+          <div id='ui-controls'>
+            <label>What would you like to explore? </label>
+            <!-- instructions for the user as label -->
+            <select id="Housing">
+              <option value="B25002e3" selected>Housing</option> <!-- selected indicates that this is the default option -->
+              <option value="B15003e22">Education</option>
+              <option value="B12001e13">Marriage</option>
+              <option value="B17010e2">Family</option>
+            </select>
           </div>
-
+          <!-- end ui-controls -->
 
         </div>
       </div>
@@ -116,10 +145,22 @@
           <li>Map Developer: <a href="https://github.com/MapWeaver"> L Weaver</a></li>
           <li>Data Source:
             <a href="https://www.census.gov/programs-surveys/geography.html">U.S. Census Bureau American Community Survey</a>
+          <li>Created 2019.06 for MAP 673.</li>
         </ul>
       </div>
     </footer>
   </div> <!-- end .container-fluid -->
+
+
+
+
+  <!-- THESE SHOULD MAYBE MOVE UP WHERE THE OTHER DROPDOWN CODE IS CURRENTLY LOCATED -->
+  <!-- legend div is selected by the JS and dynamically added to the map -->
+  <div id="legend"></div>
+
+
+
+
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
   </script>
@@ -127,214 +168,268 @@
   </script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
   </script>
-
   <script src="https://d3js.org/d3.v5.js"></script>
   <script src="https://unpkg.com/topojson@3"></script>
+  <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.3.5/chroma.min.js"></script>
 
+
+  <!-- JS, LEAFLET, STATISTICS -->
+  <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/simple-statistics@5.2.1/dist/simple-statistics.min.js"></script>
 
 
 
   <script>
-    // JavaScript
+    // map options
+    // console.log("test")
 
-    // asynchronous calls to data files
-    const statesJson = d3.json('data/us-states.json');
-    const facilityCSV = d3.csv('data/facility-emissions-2016.csv');
+    var options = {
+      scrollWheelZoom: true,
+      zoomSnap: .1,
+      dragging: true,
+      zoomControl: true
+    }
 
-    // use promise to call all data files, then send data to callback
-    Promise.all([statesJson, facilityCSV])
-      .then(drawMap)
-      .catch(error => {
-        console.log(error)
-      });
+    // console.log("test")
+
+    // ESTABLISH MAP. create the Leaflet map
+    var map = L.map('map', options);
+
+    // console.log("test")
+
+    // LOAD BASEMAP. request tiles and add to map
+    // ADD BASEMAP
+    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    });
+    tiles.addTo(map);
+    console.log('basemap added')
+
+    // console.log("test")
+
+    // MAPPED VARIABLES. set global variables for map layer (mapped attribute, and normalizing attribute)
+    var attributeValue = "B25002e3",
+      normValue = "B25002e1";
+
+    // LEGEND TITLES. create object to hold legend titles
+    var labels = {
+      "B25002e3": "Housing",
+      "B15003e22": "Education",
+      "B12001e13": "Marriage",
+      "B17010e2": "Family"
+    }
+
+    // console.log("test")
+
+    // CALL DATA, DRAW MAP. AJAX call to load BG-level data
+    $.getJSON("data/FayetteBG_WGS84_esri_geo.json", function(data) {
+      drawMap(data); // draw the map using GeoJSON data
+
+      // This is where the code stops working. But why???
+      console.log("test")
+
+      // console.log("data")
+    });
 
 
 
     // function called when Promise above is complete
     function drawMap(data) {
+      // console.log("data")
 
-      console.log(data); // our two datasets within an array
-
-      // data is array of our two datasets
-      const statesData = data[0];
-      const facilityData = data[1];
-
-      // select the HTML element that will hold our map
-      const mapContainer = d3.select('#map')
-
-      // determine width and height of map from container
-      const width = mapContainer.node().offsetWidth - 60;
-      const height = mapContainer.node().offsetHeight - 60;
-
-      const svg = mapContainer
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .classed('position-absolute', true) // add bootstrap class
-        .style('top', 40)
-        .style('left', 30);
-
-
-      // convert the states data topojson to a geojson
-      const geojson = topojson.feature(statesData, {
-        type: 'GeometryCollection',
-        geometries: statesData.objects.cb_2016_us_state_20m.geometries
-      });
-
-      // fit the contents to teh extent using the geoAlbersUsa projection
-      const projection = d3.geoAlbersUsa()
-        .fitSize([width, height], geojson);
-      const path = d3.geoPath()
-        .projection(projection);
-
-      // draw certain data to hte map namely the state data converted to geojson above
-      const states = svg.append('g')
-        .selectAll('path')
-        .data(geojson.features)
-        .join('path')
-        .attr('d', path)
-        .attr('class', 'state');
-
-
-
-
-      // define radius generator
-      // I didn't apply the proportional symbols as I didn't figure out how to replace the chained radius attribute. Kept getting errors. No luck. Not sure what the solution is.
-      // const radius = d3.scaleSqrt()
-      // .domain([0, 1e6])
-      // .range([1, 9]);
-      //console.log(radius(25)); // output is 1.04
-
-
-
-      // define radius generator
-      const radius = d3.scaleSqrt().domain([0, 1e6]).range([1, 9]);
-      console.log(radius(25)); // output is 1.04
-
-
-      // TEST YOUR KNOWLEDGE: BECAUSE THE VARIABLES ARE DIFFERENT, THE COLORS SHOULD BE DIFFERENT AS WELL RATHER THAN INFERING INFORMATION FROM A GRADIENT.
-      // define color generator.
-      const color = d3.scaleOrdinal(d3.schemeSet1);
-      // console.log(color('Power Plants')); // output is #e41a1c
-
-
-      const facilities = svg.append('g') // append new g element
-        .selectAll('circle') // select all the circles
-        .data(facilityData) // use the facility CSV data
-        .join('circle') // join that data to circle elements
-        .attr('cx', d => { // feed the long/lat to the projection generator. cx = horizontal pixel distance from the top left corder of the parent SVG element to the center of the circle
-          d.position = projection([d.Longitude, d.Latitude]); // create a new data attribute
-          return d.position[0]; // position the x
-        })
-        .attr('cy', d => { // cy = vertical pixel distance from the top left corder of the parent SVG element to the center of the circle
-          return d.position[1]; // position the y
-        })
-        .style('fill', d => {
-          return color(d.Industry_Type);
-        })
-        // .attr('r', 2) // define the radius. r = the radius in pixels
-        .data(facilityData.sort(function(a, b) {
-          return b.Total - a.Total; // place the large ones on the bottom
-        }))
-        .attr('r', d => {
-          // console.log('data', d)
-          return radius(+d.Total);
-        })
-        .attr('class', 'facility'); // give each circle a class name
-
-
-
-      filterByAttribute(facilityData, facilities);
-
-      drawLegend(svg, width, height, radius);
-
-
-    }
-
-
-
-    function filterByAttribute(facilityData, facilities) {
-      // code
-
-      // CREATE ARRAY OF INIQUE INDUSTRY TYPES
-      // array to hold select options
-      var uniqueTypes = [];
-
-      // loop through all features and push unique types to array
-      facilityData.forEach(function(facility) {
-        if (!uniqueTypes.includes(facility.Industry_Type)) {
-          uniqueTypes.push(facility.Industry_Type);
+      // ADD LAYER AND CONFIGURE MOUSE ACTION. create Leaflet data layer and add to map. configure response when mouse is over feature and removed from feature.
+      var dataLayer = L.geoJson(data, {
+        style: function(feature) {
+          // style polygons with initial default path options
+          return {
+            color: '#dddddd',
+            weight: 2,
+            fillOpacity: .5,
+            fillColor: '#1f78b4'
+          };
+        },
+        onEachFeature: function(feature, layer) {
+          // when mousing over a layer
+          layer.on('mouseover', function() {
+            // change the stroke color and bring that element to the front
+            layer.setStyle({
+              color: '#ff6e00'
+            }).bringToFront();
+          });
+          // on mousing off layer
+          layer.on('mouseout', function() {
+            // reset the layer style to its original stroke color
+            layer.setStyle({
+              color: '#dddddd'
+            });
+          });
         }
+      }).addTo(map);
+
+      // EXTENT AND ZOOM. fit the map's bounds and zoom level using the dataLayer extent
+      map.fitBounds(dataLayer.getBounds(), {
+        paddingTopLeft: [25, 25] // push off top left for sake of legend
       });
 
-      // sort strings alphabetically
-      uniqueTypes.sort();
+      // code moved to updateMap function
 
-      // add an all facilities to the beginning
-      uniqueTypes.unshift('All facilities');
+      addUi(dataLayer); // add the UI controls
 
+      updateMap(dataLayer); // update the map with the current data attribute
 
-      // DYNAMICALLY CREATE HTML ELEMENTS OF THE DROPDOWN OPTIONS
-      // select all the options (that don't exist yet)
-      d3.select('#ui .dropdown-menu').selectAll('a')
-        .data(uniqueTypes) // use array as data
-        .join('a') // append a new option element for each data item
-        .text(d => {
-          return d // use the item as text
-        })
-        .attr('value', d => {
-          return d // use the time as value attribute
-        })
-        .attr('href', '#')
-        .classed('dropdown-item', true)
-        .on('click', onchange(facilities)); // when the user clicks call onchange function
     }
 
+    function updateMap(dataLayer) {
 
-    // DETERMINE WHICH DROPDOWN WAS SELECTED, DISPLAY SELECTED CIRCLE(S), UPDATE THE UI WITH THE CURRENT SELECTION
-    function onchange(facilities) {
-      // get the currently selected value
-      let val = d3.select(this).attr('value');
+      // CLASS BREAKS. get the class breaks for the current data attribute
+      var breaks = getClassBreaks(dataLayer);
 
-      // change the display property for each circle
-      facilities.style('display', d => {
-        if (val === 'All facilities') return 'inline';
-        if (d.Industry_Type != val) return 'none';
+      // ADD LEGEND
+      addLegend(breaks); // add the legend to the map using breaks
+
+      // INFO BOXES loop through each county layer to update the color and tooltip info
+      dataLayer.eachLayer(function(layer) {
+
+        var props = layer.feature.properties;
+
+        // set the fill color of layer based on its normalized data value
+        layer.setStyle({
+          fillColor: getColor(props[attributeValue] /
+            props[normValue], breaks)
+        });
+
+        // assemble string sequence of info for tooltip (end line break with + operator)
+        var tooltipInfo = "<b>" + props["NAME"] +
+          " Block Group </b></br>" +
+          ((props[attributeValue] / props[normValue]) * 100).toLocaleString() +
+          "%";
+
+        // bind a tooltip to layer with county-specific information
+        layer.bindTooltip(tooltipInfo, {
+          // sticky property so tooltip follows the mouse
+          sticky: true,
+          tooltipAnchor: [200, 200]
+        });
+
       });
 
-      d3.select('#ui > a').html(val); // update the UI with current val
     }
 
+    function getClassBreaks(dataLayer) {
 
-    function drawLegend(svg, width, height, radius) {
+      // create empty Array for storing values
+      var values = [];
 
-      const legend = svg.append('g')
-        .attr('dy', '1.3em')
-        .attr('class', 'legend')
-        .attr('transform', 'translate(' + (width - 40) + ',' + (height - 20) + ')')
-        .selectAll('g')
-        .data([5e6, 2e7])
-        .join('g');
+      // loop through all the counties
+      dataLayer.eachLayer(function(layer) {
+        var value = (layer.feature.properties[attributeValue] / layer.feature.properties[normValue]);
+        values.push(value); // push the normalized value for each layer into the Array
+      });
 
-      legend.append('circle')
-        .attr('cy', d => {
-          return -radius(d);
-        })
-        .attr('r', radius);
+      // determine similar clusters
+      var clusters = ss.ckmeans(values, 4);
 
-      legend.append('text')
-        .attr('y', d => {
-          return -2 * radius(d);
-        })
-        .attr('dy', '1.3em')
-        .text(d3.format('.1s'));
+      // create an array of the lowest value within each cluster
+      var breaks = clusters.map(function(cluster) {
+        return [cluster[0], cluster.pop()];
+      });
 
-      legend.append('text')
-        .attr('y', 16)
-        .text('metric tons');
-      //}
+      //return array of arrays, e.g., [[0.24,0.25], [0.26, 0.37], etc]
+      return breaks;
 
+    }
 
+    function getColor(d, breaks) {
+      // function accepts a single normalized data attribute value
+      // and uses a series of conditional statements to determine which
+      // which color value to return to return to the function caller
+
+      if (d <= breaks[0][1]) {
+        return '#e5f5f9';
+      } else if (d <= breaks[1][1]) {
+        return '#99d8c9';
+      } else if (d <= breaks[2][1]) {
+        return '#41ae76';
+      } else if (d <= breaks[3][1]) {
+        return '#006d2c'
+      } else if (d <= breaks[4][1]) {
+        return '#00441b'
+      }
+
+    }
+
+    function addLegend(breaks) {
+
+      // create a new Leaflet control object, and position it top left
+      var legendControl = L.control({
+        position: 'topleft'
+      });
+
+      // when the legend is added to the map
+      legendControl.onAdd = function(map) {
+
+        // select a div element with an id attribute of legend
+        var legend = L.DomUtil.get('legend');
+
+        // disable scroll and click/touch on map when on legend
+        L.DomEvent.disableScrollPropagation(legend);
+        L.DomEvent.disableClickPropagation(legend);
+
+        // return the selection to the method
+        return legend;
+
+      };
+
+      // add the empty legend div to the map
+      legendControl.addTo(map);
+
+      updateLegend(breaks);
+      // update legend function code removed from this location
+
+    }
+
+    function updateLegend(breaks) {
+
+      // select the legend, add a title, begin an unordered list and assign to a variable
+      var legend = $('#legend').html("<h5>" + labels[attributeValue] + "</h5>");
+
+      // loop through the Array of classification break values
+      for (var i = 0; i <= breaks.length - 1; i++) {
+
+        var color = getColor(breaks[i][0], breaks);
+
+        legend.append(
+          '<span style="background:' + color + '"></span> ' +
+          '<label>' + (breaks[i][0] * 100).toLocaleString() + ' &mdash; ' +
+          (breaks[i][1] * 100).toLocaleString() + ' %</label>');
+      }
+
+    }
+
+    function addUi(dataLayer) {
+      // create the dropdown control
+      var selectControl = L.control({
+        position: 'topleft'
+      });
+
+      // when control is added
+      selectControl.onAdd = function(map) {
+        // get the element with id attribute of ui-controls
+        return L.DomUtil.get("ui-controls");
+      }
+      // add the control to the map
+      selectControl.addTo(map);
+
+      //update attribute value when users change the drop down
+      $('select[id="Housing"]').change(function() {
+        attributeValue = this.value;
+        updateMap(dataLayer);
+        //updateLegend(breaks);
+      });
 
     }
   </script>
