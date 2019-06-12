@@ -19,7 +19,6 @@
       height: calc(40vh);
     }
 
-
     .leaflet-tooltip {
       min-width: 200px;
       font-size: 140%;
@@ -68,11 +67,9 @@
     } */
 
     /* Small devices (landscape phones, 576px and up) */
-
     @media (min-width: 576px) {}
 
     /* Medium devices (tablets, 768px and up) */
-
     @media (min-width: 768px) {
       #map {
         height: calc(60vh);
@@ -80,9 +77,7 @@
     }
 
     /* Large devices (desktops, 992px and up) */
-
     @media (min-width: 992px) {
-
       #map {
         height: calc(80vh);
       }
@@ -108,10 +103,8 @@
           <!-- ui-controls div is selected by the JS and dynamically added to the map -->
           <div id='ui-controls'>
             <!-- <label>What would you like to explore? </label> -->
-            <!-- instructions for the user as label -->
             <select id="Housing">
-              <option value="B25002e3" selected>Housing</option>
-              <!-- selected indicates that this is the default option -->
+              <option value="B25002e3" selected>Housing</option> <!-- selected indicates that this is the default option -->
               <!-- <option value="B02001e1">Population</option> -->
               <option value="B15003e22">Education</option>
               <option value="B12001e13">Marriage</option>
@@ -130,7 +123,6 @@
             reality. This map provides detailed block group level statistical information from 2016 5-year American
             Community Survey in the categories of
             Population, Housing, Education, Marriage, and Family.</p>
-          <p><b>Population</b><br>Total Population(B02001e1)/Area(ALAND)</p>
           <p><b>Housing</b><br>Vacant Housing(B25002e3)/Total Housing Units(B25002e1)</p>
           <p><b>Education</b><br>Bachelor's Degree(B15003e22)/25+ Population(B15003e1)</p>
           <p><b>Marriage</b><br>Females Currently Married(B12001e13)/Total Females(B12001e11)</p>
@@ -139,7 +131,6 @@
       </aside>
 
     </section>
-
 
     <footer class="row bg-dark text-white py-3">
       <div class="col mx-2">
@@ -153,11 +144,9 @@
       </div>
     </footer>
 
-
   </div>
   <!-- end .container-fluid -->
 
-  <!-- THESE SHOULD MAYBE MOVE UP WHERE THE OTHER DROPDOWN CODE IS CURRENTLY LOCATED -->
   <!-- legend div is selected by the JS and dynamically added to the map -->
   <div id="legend"></div>
 
@@ -176,8 +165,6 @@
 
   <script>
     // map options
-    // console.log("test")
-
     var options = {
       scrollWheelZoom: true,
       zoomSnap: .1,
@@ -185,25 +172,16 @@
       zoomControl: true
     }
 
-    // console.log("test")
-
     // ESTABLISH MAP. create the Leaflet map
     var map = L.map('map', options);
 
-    // console.log("test")
-
     // LOAD BASEMAP. request tiles and add to map
-    // ADD BASEMAP
     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
       subdomains: 'abcd',
       maxZoom: 19
     });
     tiles.addTo(map);
-
-    // console.log('basemap added')
-
-    // console.log("test")
 
     // MAPPED VARIABLES. set global variables for map layer (mapped attribute, and normalizing attribute)
     var attributeValue = "B25002e3",
@@ -234,8 +212,6 @@
       "B17010e2": "Families Below Poverty Level"
     }
 
-    // console.log("test")
-
     // CALL DATA, DRAW MAP. AJAX call to load BG-level data
     $.getJSON("data/FayetteBG_WGS84_esri_topo.json", function(data) {
 
@@ -245,13 +221,12 @@
         geometries: data.objects.FayetteBG_WGS84_esri.geometries
       });
 
-      drawMap(dataBG); // draw the map using GeoJSON data
+      // draw the map using GeoJSON data
+      drawMap(dataBG);
 
     }).fail(function(err) {
       console.log(err)
     });
-
-    // function called when Promise above is complete
 
 
     function drawMap(data) {
@@ -290,7 +265,6 @@
         paddingTopLeft: [25, 25] // push off top left for sake of legend
       });
 
-      // code moved to updateMap function
       addUi(dataLayer); // add the UI controls
 
       updateMap(dataLayer); // update the map with the current data attribute
@@ -341,8 +315,6 @@
         var value = (layer.feature.properties[attributeValue] / layer.feature.properties[normValue]);
         values.push(value); // push the normalized value for each layer into the Array
       });
-
-      // console.log(normValue);
 
       // determine similar clusters
       var clusters = ss.ckmeans(values, 4); // using ckmeans which is similar to natural jenks
@@ -401,9 +373,8 @@
       // add the empty legend div to the map
       legendControl.addTo(map);
 
-      updateLegend(breaks);
       // update legend function code removed from this location
-
+      updateLegend(breaks);
     }
 
     function updateLegend(breaks) {
