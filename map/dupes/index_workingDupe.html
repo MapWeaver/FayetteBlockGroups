@@ -113,7 +113,6 @@
             <select id="Housing">
               <option value="B25002e3" selected>Housing</option>
               <!-- selected indicates that this is the default option -->
-              <!-- <option value="B02001e1">Population</option> -->
               <option value="B15003e22">Education</option>
               <option value="B12001e13">Marriage</option>
               <option value="B17010e2">Family</option>
@@ -131,7 +130,9 @@
             reality. This map provides detailed block group level statistical information from 2016 5-year American
             Community Survey in the categories of
             Population, Housing, Education, Marriage, and Family.</p>
-          <p><b>Population</b><br>Total Population(B02001e1)/Area(ALAND)</p>
+          <p><b>Population</b><br>Total Population(B02001e1)/Area(ALAND)<br>? INCLUDE LEGEND BENEATH EACH ITEM LISTED IN
+            PANE AS A MEANS OF SHOWING THE RANGE OF VALUES ACROSS CATEGORIES USING THE SAME CLASSIFICATION METHOD
+            (PROBABLY QUANTILES)?</p>
           <p><b>Housing</b><br>Vacant Housing(B25002e3)/Total Housing Units(B25002e1)</p>
           <p><b>Education</b><br>Bachelor's Degree(B15003e22)/25+ Population(B15003e1)</p>
           <p><b>Marriage</b><br>Females Currently Married(B12001e13)/Total Females(B12001e11)</p>
@@ -204,8 +205,7 @@
       maxZoom: 19
     });
     tiles.addTo(map);
-
-    // console.log('basemap added')
+    console.log('basemap added')
 
     // console.log("test")
 
@@ -213,21 +213,12 @@
     var attributeValue = "B25002e3",
       normValue = "B25002e1";
 
-    // define norm values based on attribute value to use as new parameters are selected
-    // if (attributeValue === "B02001e1") {normValue = "ALAND"}; // population
-    if (attributeValue === "B25002e3") {normValue = "B25002e1"}; // housing
-    if (attributeValue === "B15003e22") {normValue = "B15003e1"}; // education
-    if (attributeValue === "B12001e13") {normValue = "B12001e11"}; // marriage
-    if (attributeValue === "B17010e2") {normValue = "B17010e1"}; // family
-
-
     // LEGEND TITLES. create object to hold legend titles
     var labels = {
-      // "B02001e1": "Population Density",
-      "B25002e3": "Vacant Housing",
-      "B15003e22": "25+ Population with Bachelor's Degree",
-      "B12001e13": "Females Married",
-      "B17010e2": "Families Below Poverty Level"
+      "B25002e3": "Housing",
+      "B15003e22": "Education",
+      "B12001e13": "Marriage",
+      "B17010e2": "Family"
     }
 
     // console.log("test")
@@ -235,22 +226,25 @@
     // CALL DATA, DRAW MAP. AJAX call to load BG-level data
     $.getJSON("data/FayetteBG_WGS84_esri_topo.json", function (data) {
 
+      // data is topojson here
+      console.log(data)
+
       //convert to GeoJSON
-      var dataBG = topojson.feature(data, {
+      var dataGeoJson = topojson.feature(data, {
         type: 'GeometryCollection',
         geometries: data.objects.FayetteBG_WGS84_esri.geometries
       });
 
-      drawMap(dataBG); // draw the map using GeoJSON data
+      drawMap(dataGeoJson); // draw the map using GeoJSON data
 
+      // console.log("data")
     }).fail(function (err) {
       console.log(err)
     });
 
     // function called when Promise above is complete
-
-
     function drawMap(data) {
+      // console.log("data")
 
       // ADD LAYER AND CONFIGURE MOUSE ACTION. create Leaflet data layer and add to map. configure response when mouse is over feature and removed from feature.
       var dataLayer = L.geoJson(data, {
@@ -313,7 +307,9 @@
         });
 
         // assemble string sequence of info for tooltip (end line break with + operator)
-        var tooltipInfo = "<b>" + "GEOID " + props["GEOID"] + "<br>" + "BG Percent: " + ((props[attributeValue] / props[normValue]) * 100).toLocaleString() +
+        var tooltipInfo = "<b>" + props["NAME"] +
+          " Block Group </b></br>" +
+          ((props[attributeValue] / props[normValue]) * 100).toLocaleString() +
           "%";
 
         // bind a tooltip to layer with county-specific information
@@ -338,10 +334,8 @@
         values.push(value); // push the normalized value for each layer into the Array
       });
 
-      // console.log(normValue);
-
       // determine similar clusters
-      var clusters = ss.ckmeans(values, 4); // using ckmeans which is similar to natural jenks
+      var clusters = ss.ckmeans(values, 4);
 
       // create an array of the lowest value within each cluster
       var breaks = clusters.map(function (cluster) {
@@ -438,14 +432,13 @@
       //update attribute value when users change the drop down
       $('select[id="Housing"]').change(function () {
         attributeValue = this.value;
-        //normValue = 'B25002e1'
         updateMap(dataLayer);
         //updateLegend(breaks);
       });
 
     }
 
-
+    
   </script>
 </body>
 
