@@ -25,10 +25,8 @@ Why I Am Making This Map: To provide users with a deeper look at informative dat
 ## CONTENT REQUIREMENTS
 
 * toggle between statistical data sets to see the chloroplethed results
-* mouseover functionality to show what all of the stats available for the BG
-* pop-ups that stay engaged until closed and show the median values for the county next to the value for the selected block group
-* ability to use at least 2 basemaps
-* print to pdf with metadata information
+* mouseover functionality to show selected stats for the BG
+* pop-ups that stay engaged until mouseout
 
 
 ## TECHNOLOGY STACK

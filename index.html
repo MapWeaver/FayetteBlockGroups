@@ -8,8 +8,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
   <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
-  <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/cerulean/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-C++cugH8+Uf86JbNOnQoBweHHAe/wVKN/mb0lTybu/NZ9sEYbd+BbbYtNpWYAsNP" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/cerulean/bootstrap.min.css" rel="stylesheet" integrity="sha384-C++cugH8+Uf86JbNOnQoBweHHAe/wVKN/mb0lTybu/NZ9sEYbd+BbbYtNpWYAsNP" crossorigin="anonymous">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
@@ -162,13 +161,10 @@
   <!-- legend div is selected by the JS and dynamically added to the map -->
   <div id="legend"></div>
 
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
   </script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
   </script>
   <script src="https://d3js.org/d3.v5.js"></script>
   <script src="https://unpkg.com/topojson@3"></script>
@@ -215,10 +211,18 @@
 
     // define norm values based on attribute value to use as new parameters are selected
     // if (attributeValue === "B02001e1") {normValue = "ALAND"}; // population
-    if (attributeValue === "B25002e3") {normValue = "B25002e1"}; // housing
-    if (attributeValue === "B15003e22") {normValue = "B15003e1"}; // education
-    if (attributeValue === "B12001e13") {normValue = "B12001e11"}; // marriage
-    if (attributeValue === "B17010e2") {normValue = "B17010e1"}; // family
+    if (attributeValue === "B25002e3") {
+      normValue = "B25002e1"
+    }; // housing
+    if (attributeValue === "B15003e22") {
+      normValue = "B15003e1"
+    }; // education
+    if (attributeValue === "B12001e13") {
+      normValue = "B12001e11"
+    }; // marriage
+    if (attributeValue === "B17010e2") {
+      normValue = "B17010e1"
+    }; // family
 
 
     // LEGEND TITLES. create object to hold legend titles
@@ -233,7 +237,7 @@
     // console.log("test")
 
     // CALL DATA, DRAW MAP. AJAX call to load BG-level data
-    $.getJSON("data/FayetteBG_WGS84_esri_topo.json", function (data) {
+    $.getJSON("data/FayetteBG_WGS84_esri_topo.json", function(data) {
 
       //convert to GeoJSON
       var dataBG = topojson.feature(data, {
@@ -243,7 +247,7 @@
 
       drawMap(dataBG); // draw the map using GeoJSON data
 
-    }).fail(function (err) {
+    }).fail(function(err) {
       console.log(err)
     });
 
@@ -254,7 +258,7 @@
 
       // ADD LAYER AND CONFIGURE MOUSE ACTION. create Leaflet data layer and add to map. configure response when mouse is over feature and removed from feature.
       var dataLayer = L.geoJson(data, {
-        style: function (feature) {
+        style: function(feature) {
           // style polygons with initial default path options
           return {
             color: '#dddddd',
@@ -263,16 +267,16 @@
             fillColor: '#1f78b4'
           };
         },
-        onEachFeature: function (feature, layer) {
+        onEachFeature: function(feature, layer) {
           // when mousing over a layer
-          layer.on('mouseover', function () {
+          layer.on('mouseover', function() {
             // change the stroke color and bring that element to the front
             layer.setStyle({
               color: '#ff6e00'
             }).bringToFront();
           });
           // on mousing off layer
-          layer.on('mouseout', function () {
+          layer.on('mouseout', function() {
             // reset the layer style to its original stroke color
             layer.setStyle({
               color: '#dddddd'
@@ -302,7 +306,7 @@
       addLegend(breaks); // add the legend to the map using breaks
 
       // INFO BOXES loop through each county layer to update the color and tooltip info
-      dataLayer.eachLayer(function (layer) {
+      dataLayer.eachLayer(function(layer) {
 
         var props = layer.feature.properties;
 
@@ -333,7 +337,7 @@
       var values = [];
 
       // loop through all the counties
-      dataLayer.eachLayer(function (layer) {
+      dataLayer.eachLayer(function(layer) {
         var value = (layer.feature.properties[attributeValue] / layer.feature.properties[normValue]);
         values.push(value); // push the normalized value for each layer into the Array
       });
@@ -344,7 +348,7 @@
       var clusters = ss.ckmeans(values, 4); // using ckmeans which is similar to natural jenks
 
       // create an array of the lowest value within each cluster
-      var breaks = clusters.map(function (cluster) {
+      var breaks = clusters.map(function(cluster) {
         return [cluster[0], cluster.pop()];
       });
 
@@ -380,7 +384,7 @@
       });
 
       // when the legend is added to the map
-      legendControl.onAdd = function (map) {
+      legendControl.onAdd = function(map) {
 
         // select a div element with an id attribute of legend
         var legend = L.DomUtil.get('legend');
@@ -428,7 +432,7 @@
       });
 
       // when control is added
-      selectControl.onAdd = function (map) {
+      selectControl.onAdd = function(map) {
         // get the element with id attribute of ui-controls
         return L.DomUtil.get("ui-controls");
       }
@@ -436,7 +440,7 @@
       selectControl.addTo(map);
 
       //update attribute value when users change the drop down
-      $('select[id="Housing"]').change(function () {
+      $('select[id="Housing"]').change(function() {
         attributeValue = this.value;
         //normValue = 'B25002e1'
         updateMap(dataLayer);
@@ -444,8 +448,6 @@
       });
 
     }
-
-
   </script>
 </body>
 
