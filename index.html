@@ -20,7 +20,7 @@
     }
 
     .leaflet-tooltip {
-      min-width: 200px;
+      min-width: 250px;
       font-size: 140%;
       white-space: normal;
     }
@@ -289,9 +289,14 @@
             props[normValue], breaks)
         });
 
+
+
         // assemble string sequence of info for tooltip (end line break with + operator)
-        var tooltipInfo = "<b>" + "GEOID " + props["GEOID"] + "<br>" + "BG Percent: " + ((props[attributeValue] / props[normValue]) * 100).toLocaleString() +
-          "%";
+        var tooltipInfo =
+        "<b>BG Percent: " + ((props[attributeValue] / props[normValue]) * 100) +
+        "</b><i>" + "<br><br>(GEOID " + props["GEOID"] + ")</i><br>"
+        .toLocaleString()
+        // + "%</b>";
 
         // bind a tooltip to layer with county-specific information
         layer.bindTooltip(tooltipInfo, {
