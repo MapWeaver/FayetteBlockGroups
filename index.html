@@ -39,9 +39,12 @@
       max-width: 165px;
     }
 
-    #legend h5 {
+    #legend h1 {
       font-size: 2.1rem;
+        color:green;
     }
+
+
 
     #legend span {
       width: 150px;
@@ -89,7 +92,7 @@
 
   <div class="container-fluid">
 
-    <header class="row py-3 bg-dark text-white">
+    <header class="row py-3 bg-light text-success">
       <div class="col mx-2">
         <h1 class="h1">Deep Data Dive: Fayette County Block Groups</h1>
       </div>
@@ -131,7 +134,7 @@
 
     </section>
 
-    <footer class="row bg-dark text-white py-3">
+    <footer class="row bg-light text-dark py-3">
       <div class="col mx-2">
         <ul class="list-unstyled">
           <li>Map Developer: <a href="https://github.com/MapWeaver"> L Weaver</a></li>
@@ -339,15 +342,15 @@
       // which color value to return to return to the function caller
 
       if (d <= breaks[0][1]) {
-        return '#e5f5f9';
+        return '#d0d1e6';
       } else if (d <= breaks[1][1]) {
-        return '#99d8c9';
+        return '#a6bddb';
       } else if (d <= breaks[2][1]) {
-        return '#41ae76';
+        return '#74a9cf';
       } else if (d <= breaks[3][1]) {
-        return '#006d2c'
+        return '#2b8cbe'
       } else if (d <= breaks[4][1]) {
-        return '#00441b'
+        return '#045a8d'
       }
 
     }
